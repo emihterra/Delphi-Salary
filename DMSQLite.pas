@@ -28,12 +28,36 @@ type
   TSalaryFieldsArray = array of TSalaryFieldData;
 
 type
+  TEmployeesSignedFilter = (empAll, empSigned, empUnsigned);
+
+type
   TDM = class(TDataModule)
     SQLConnection: TFDConnection;
-    FDQuery1: TFDQuery;
+    QueryEmployees: TFDQuery;
     FDTransaction1: TFDTransaction;
     FDGUIxWaitCursor1: TFDGUIxWaitCursor;
     FDPhysSQLiteDriverLink1: TFDPhysSQLiteDriverLink;
+    QueryEmployeesid: TFDAutoIncField;
+    QueryEmployeesid_department: TIntegerField;
+    QueryEmployeesname: TWideMemoField;
+    QueryEmployeesid_user: TWideMemoField;
+    QueryEmployeesmonth: TWideMemoField;
+    QueryEmployeesyear: TWideMemoField;
+    QueryEmployeesincome_fields: TWideMemoField;
+    QueryEmployeesincome_values: TWideMemoField;
+    QueryEmployeesincome_sum: TWideMemoField;
+    QueryEmployeeswithheld_fields: TWideMemoField;
+    QueryEmployeeswithheld_values: TWideMemoField;
+    QueryEmployeeswithheld_sum: TWideMemoField;
+    QueryEmployeesmonth_begin: TWideMemoField;
+    QueryEmployeespay_all: TWideMemoField;
+    QueryEmployeespayments_fields: TWideMemoField;
+    QueryEmployeespayments_values: TWideMemoField;
+    QueryEmployeespayments_sum: TWideMemoField;
+    QueryEmployeessalary_hand: TWideMemoField;
+    QueryEmployeessigned: TBooleanField;
+    QueryEmployeessign_time: TSQLTimeStampField;
+    QueryEmployeessign_pic: TBlobField;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
   private
@@ -73,6 +97,10 @@ type
       APaymentsSum: TSalaryFieldData;
       ASalaryHand: TSalaryFieldData);
 
+    procedure OpenEmployeesQuery(
+      AMonthYear: String;
+      AEmployeesSignedFilter: TEmployeesSignedFilter;
+      ADepartment: String = '');
     function GetOrAddDepartment(ADepartmentName: String): Integer;
     procedure GetDepartments(SL: TStrings);
     procedure GetPeriods(SL: TStrings);
@@ -524,8 +552,6 @@ begin
 end;
 
 procedure TDM.GetPeriods(SL: TStrings);
-var
-  MonthToStr: String;
 begin
   SL.Clear;
   OpenSQL('select distinct month,year from EMPLOYEE order by year desc, month desc',
@@ -534,21 +560,9 @@ begin
    begin
      while not AADQuery.Eof do
      begin
-       case AADQuery.FieldByName('month').AsInteger of
-         1:  MonthToStr := 'Январь';
-         2:  MonthToStr := 'Февраль';
-         3:  MonthToStr := 'Март';
-         4:  MonthToStr := 'Апрель';
-         5:  MonthToStr := 'Май';
-         6:  MonthToStr := 'Июнь';
-         7:  MonthToStr := 'Июль';
-         8:  MonthToStr := 'Август';
-         9:  MonthToStr := 'Сентябрь';
-         10: MonthToStr := 'Октябрь';
-         11: MonthToStr := 'Ноябрь';
-         12: MonthToStr := 'Декабрь';
-       end;
-       SL.Add(MonthToStr + ' ' + AADQuery.FieldByName('year').AsString + 'г.');
+       SL.Add(
+         AADQuery.FieldByName('month').AsString + ' ' +
+         AADQuery.FieldByName('year').AsString + 'г.');
        AADQuery.Next;
      end;
    end);
@@ -671,6 +685,53 @@ begin
      AADQuery.ParamByName('payments_fields').AsString := GetSalaryFieldsArrayNames(APaymentsFields);
      AADQuery.ParamByName('payments_values').AsString := GetSalaryFieldsArrayValues(APaymentsFields);
     end);
+end;
+
+procedure TDM.OpenEmployeesQuery(
+  AMonthYear: String;
+  AEmployeesSignedFilter: TEmployeesSignedFilter;
+  ADepartment: String = '');
+var
+  i: Integer;
+begin
+  QueryEmployees.Active := False;
+
+  case AEmployeesSignedFilter of
+    empAll:
+      begin
+        QueryEmployees.SQL.Text :=
+          'select * from EMPLOYEE where month=:month and year=:year';
+      end;
+    empSigned:
+      begin
+        QueryEmployees.SQL.Text :=
+          'select * from EMPLOYEE where month=:month and year=:year and signed=''TRUE''';
+      end;
+    empUnsigned:
+      begin
+        QueryEmployees.SQL.Text :=
+          'select * from EMPLOYEE where month=:month and year=:year and signed=''FALSE''';
+      end;
+  end;
+
+  if ADepartment <> '' then
+  begin
+    QueryEmployees.SQL.Text := QueryEmployees.SQL.Text + ' and id_department=:id_department';
+  end;
+
+  QueryEmployees.SQL.Text := QueryEmployees.SQL.Text + ' order by name';
+
+  i := pos(' ', AMonthYear);
+
+  QueryEmployees.ParamByName('month').AsString := Copy(AMonthYear, 1, i - 1);
+  QueryEmployees.ParamByName('year').AsString := Copy(AMonthYear, i + 1, Length(AMonthYear) - i - 2);
+
+  if ADepartment <> '' then
+  begin
+    QueryEmployees.ParamByName('id_department').AsInteger := GetOrAddDepartment(ADepartment);
+  end;
+
+  QueryEmployees.Active := True;
 end;
 
 end.
