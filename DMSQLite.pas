@@ -9,7 +9,7 @@ uses
   FireDAC.Phys.SQLiteDef, FireDAC.Stan.ExprFuncs, FireDAC.Stan.Param,
   FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.FMXUI.Wait,
   FireDAC.Comp.UI, FireDAC.Comp.Client, Data.DB, FireDAC.Comp.DataSet,
-  System.SyncObjs, System.Variants, FMX.Dialogs;
+  System.SyncObjs, System.Variants, FMX.Dialogs, Data.SqlTimSt;
 
 const
   CtDBName = 'terra.db';
@@ -39,22 +39,22 @@ type
     FDPhysSQLiteDriverLink1: TFDPhysSQLiteDriverLink;
     QueryEmployeesid: TFDAutoIncField;
     QueryEmployeesid_department: TIntegerField;
-    QueryEmployeesname: TWideMemoField;
-    QueryEmployeesid_user: TWideMemoField;
-    QueryEmployeesmonth: TWideMemoField;
-    QueryEmployeesyear: TWideMemoField;
+    QueryEmployeesname: TStringField;
+    QueryEmployeesid_user: TStringField;
+    QueryEmployeesmonth: TStringField;
+    QueryEmployeesyear: TStringField;
     QueryEmployeesincome_fields: TWideMemoField;
     QueryEmployeesincome_values: TWideMemoField;
-    QueryEmployeesincome_sum: TWideMemoField;
+    QueryEmployeesincome_sum: TStringField;
     QueryEmployeeswithheld_fields: TWideMemoField;
     QueryEmployeeswithheld_values: TWideMemoField;
-    QueryEmployeeswithheld_sum: TWideMemoField;
-    QueryEmployeesmonth_begin: TWideMemoField;
-    QueryEmployeespay_all: TWideMemoField;
+    QueryEmployeeswithheld_sum: TStringField;
+    QueryEmployeesmonth_begin: TStringField;
+    QueryEmployeespay_all: TStringField;
     QueryEmployeespayments_fields: TWideMemoField;
     QueryEmployeespayments_values: TWideMemoField;
-    QueryEmployeespayments_sum: TWideMemoField;
-    QueryEmployeessalary_hand: TWideMemoField;
+    QueryEmployeespayments_sum: TStringField;
+    QueryEmployeessalary_hand: TStringField;
     QueryEmployeessigned: TBooleanField;
     QueryEmployeessign_time: TSQLTimeStampField;
     QueryEmployeessign_pic: TBlobField;
@@ -75,7 +75,7 @@ type
       ARecsSkip: Integer = -1;
       ARecsMax: Integer = -1): Boolean;
     function GetNewQueryInstance: TFDQuery;
-    function SaveToFileFromBlob(ASQL, AFileSpec: String; AShowErrorProc: TShowErrorProc = nil): Boolean;
+    //function SaveToFileFromBlob(ASQL, AFileSpec: String; AShowErrorProc: TShowErrorProc = nil): Boolean;
   public
     { Public declarations }
     function DBConnect(AShowErrorProc: TShowErrorProc = nil): Boolean;
@@ -104,6 +104,22 @@ type
     function GetOrAddDepartment(ADepartmentName: String): Integer;
     procedure GetDepartments(SL: TStrings);
     procedure GetPeriods(SL: TStrings);
+    procedure SaveSign(
+      Stream: TStream;
+      AMonth: String;
+      AYear: String;
+      AIDUser: String);
+    procedure SignToFile(
+      AFileName: String;
+      AMonth: String;
+      AYear: String;
+      AIDUser: String);
+    procedure SignToStream(
+      AStream: TStream;
+      AMonth: String;
+      AYear: String;
+      AIDUser: String);
+    procedure DeletePeriod(AMonthYear: String);
   end;
 
 var
@@ -114,8 +130,8 @@ implementation
 {%CLASSGROUP 'FMX.Controls.TControl'}
 
 {$R *.dfm}
-
-procedure SaveToBlobFromStream(Stream: TStream; Dataset: TDataset; const FieldName: String); overload;
+{
+procedure SaveToBlobFromStream(Stream: TStream; Dataset: TDataset; const FieldName: String);
 var
   BS: TStream;
 begin
@@ -233,7 +249,7 @@ begin
     end;
   end;
 end;
-
+}
 function GetExePath(AFileName: String = ''): String;
 begin
   Result := ExtractFilePath(ParamStr(0)) + AFileName;
@@ -262,9 +278,14 @@ begin
           SQLConnection.Connected := False;
         end;
 
+        FDPhysSQLiteDriverLink1.VendorLib := GetExePath(ctSQLiteDll);
+
+        SQLConnection.Params.Database := dbPath;
+
         with SQLConnection.Params do
         begin
-          Add(Format('Database=%s', [dbPath]));
+          Database := dbPath;
+          //Add(Format('Database=%s', [dbPath]));
           Add('LockingMode=Normal');
           Add('JournalMode=WAL');
           Add('Synchronous=Full');
@@ -334,22 +355,22 @@ begin
     'CREATE TABLE IF NOT EXISTS EMPLOYEE (' +
       '''id'' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,' +
       '''id_department'' INTEGER DEFAULT 0,' +
-      '''name'' TEXT,' +
-      '''id_user'' TEXT,' +              // Уникальный номер сотрудника
-      '''month'' TEXT,' +
-      '''year'' TEXT,' +
+      '''name'' VARCHAR2(50),' +
+      '''id_user'' VARCHAR2(10),' +              // Уникальный номер сотрудника
+      '''month'' VARCHAR2(8),' +
+      '''year'' VARCHAR2(4),' +
       '''income_fields'' TEXT,' +        // наименование полей начислений через ;
       '''income_values'' TEXT,' +        // значение полей начислений через ;
-      '''income_sum'' TEXT,' +           // Всего начислено
+      '''income_sum'' VARCHAR2(15),' +           // Всего начислено
       '''withheld_fields'' TEXT,' +      // наименование полей удержаний через ;
       '''withheld_values'' TEXT,' +      // значение полей удержаний через ;
-      '''withheld_sum'' TEXT,' +         // Всего удержано
-      '''month_begin'' TEXT,' +          // Сальдо на начало месяца
-      '''pay_all'' TEXT,' +              // Итого к выплате
+      '''withheld_sum'' VARCHAR2(15),' +         // Всего удержано
+      '''month_begin'' VARCHAR2(15),' +          // Сальдо на начало месяца
+      '''pay_all'' VARCHAR2(15),' +              // Итого к выплате
       '''payments_fields'' TEXT,' +      // наименование полей выплат через ;
       '''payments_values'' TEXT,' +      // значение полей выплат через ;
-      '''payments_sum'' TEXT,' +         // ИТОГО
-      '''salary_hand'' TEXT,' +          // К выдаче на руки
+      '''payments_sum'' VARCHAR2(15),' +         // ИТОГО
+      '''salary_hand'' VARCHAR2(15),' +          // К выдаче на руки
       '''signed'' BOOLEAN DEFAULT FALSE,' + // Подписан
       '''sign_time'' TIMESTAMP,' +          // Дата\Время подписи
       '''sign_pic'' BLOB' +                 // Изображение с подписью
@@ -551,6 +572,20 @@ begin
    end);
 end;
 
+procedure TDM.DeletePeriod(AMonthYear: String);
+begin
+  ExecSQL(
+    'delete from EMPLOYEE where month=:month and year=:year',
+    procedure(AADQuery: TFDQuery)
+    var
+      i: Integer;
+    begin
+    i := pos(' ', AMonthYear);
+     AADQuery.ParamByName('month').AsString := Copy(AMonthYear, 1, i - 1);
+     AADQuery.ParamByName('year').AsString := Copy(AMonthYear, i + 1, Length(AMonthYear) - i - 2);
+    end);
+end;
+
 procedure TDM.GetPeriods(SL: TStrings);
 begin
   SL.Clear;
@@ -566,6 +601,74 @@ begin
        AADQuery.Next;
      end;
    end);
+end;
+
+procedure TDM.SignToFile(
+  AFileName: String;
+  AMonth: String;
+  AYear: String;
+  AIDUser: String);
+begin
+  OpenSQL(
+    'select sign_pic from EMPLOYEE where id_user=:id_user and month=:month and year=:year',
+    procedure(AADQuery: TFDQuery)
+    begin
+     AADQuery.ParamByName('id_user').AsString := AIDUser;
+     AADQuery.ParamByName('month').AsString := AMonth;
+     AADQuery.ParamByName('year').AsString := AYear;
+    end,
+    procedure(AADQuery: TDataSet)
+    var
+      FS: TFileStream;
+    begin
+      FS := TFileStream.Create(AFileName, fmCreate);
+      try
+        FS.WriteData(AADQuery.Fields[0].AsBytes, Length(AADQuery.Fields[0].AsBytes));
+      finally
+        FS.Free;
+      end;
+    end);
+
+end;
+
+procedure TDM.SignToStream(
+  AStream: TStream;
+  AMonth: String;
+  AYear: String;
+  AIDUser: String);
+begin
+  OpenSQL(
+    'select sign_pic from EMPLOYEE where id_user=:id_user and month=:month and year=:year',
+    procedure(AADQuery: TFDQuery)
+    begin
+     AADQuery.ParamByName('id_user').AsString := AIDUser;
+     AADQuery.ParamByName('month').AsString := AMonth;
+     AADQuery.ParamByName('year').AsString := AYear;
+    end,
+    procedure(AADQuery: TDataSet)
+    begin
+      AStream.WriteData(AADQuery.Fields[0].AsBytes, Length(AADQuery.Fields[0].AsBytes));
+    end);
+end;
+
+procedure TDM.SaveSign(
+  Stream: TStream;
+  AMonth: String;
+  AYear: String;
+  AIDUser: String);
+begin
+  ExecSQL(
+    'update EMPLOYEE set sign_pic=:sign_pic, sign_time=:sign_time, signed=:signed where id_user=:id_user and month=:month and year=:year',
+    procedure(AADQuery: TFDQuery)
+    begin
+     AADQuery.ParamByName('id_user').AsString := AIDUser;
+     AADQuery.ParamByName('month').AsString := AMonth;
+     AADQuery.ParamByName('year').AsString := AYear;
+     AADQuery.ParamByName('signed').AsBoolean := True;
+     AADQuery.ParamByName('sign_time').AsSQLTimeStamp := DateTimeToSQLTimeStamp(Now);
+     AADQuery.ParamByName('sign_pic').LoadFromStream(Stream, TFieldType.ftBlob);
+     AADQuery.ParamByName('year').AsString := AYear;
+    end);
 end;
 
 procedure TDM.SaveEmployee(
@@ -705,12 +808,12 @@ begin
     empSigned:
       begin
         QueryEmployees.SQL.Text :=
-          'select * from EMPLOYEE where month=:month and year=:year and signed=''TRUE''';
+          'select * from EMPLOYEE where month=:month and year=:year and signed=1';
       end;
     empUnsigned:
       begin
         QueryEmployees.SQL.Text :=
-          'select * from EMPLOYEE where month=:month and year=:year and signed=''FALSE''';
+          'select * from EMPLOYEE where month=:month and year=:year and signed<>1';
       end;
   end;
 

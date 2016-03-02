@@ -6,8 +6,7 @@ object DM: TDM
   Width = 222
   object SQLConnection: TFDConnection
     Params.Strings = (
-      'DriverID=SQLite'
-      'Database=C:\MyProjects\Delphi\TerraSalary\Win32\Debug\terra.db')
+      'DriverID=SQLite')
     Transaction = FDTransaction1
     UpdateTransaction = FDTransaction1
     Left = 40
@@ -30,25 +29,25 @@ object DM: TDM
       FieldName = 'id_department'
       Origin = 'id_department'
     end
-    object QueryEmployeesname: TWideMemoField
+    object QueryEmployeesname: TStringField
       FieldName = 'name'
       Origin = 'name'
-      BlobType = ftWideMemo
+      Size = 50
     end
-    object QueryEmployeesid_user: TWideMemoField
+    object QueryEmployeesid_user: TStringField
       FieldName = 'id_user'
       Origin = 'id_user'
-      BlobType = ftWideMemo
+      Size = 10
     end
-    object QueryEmployeesmonth: TWideMemoField
+    object QueryEmployeesmonth: TStringField
       FieldName = 'month'
       Origin = 'month'
-      BlobType = ftWideMemo
+      Size = 8
     end
-    object QueryEmployeesyear: TWideMemoField
+    object QueryEmployeesyear: TStringField
       FieldName = 'year'
       Origin = 'year'
-      BlobType = ftWideMemo
+      Size = 4
     end
     object QueryEmployeesincome_fields: TWideMemoField
       FieldName = 'income_fields'
@@ -60,10 +59,10 @@ object DM: TDM
       Origin = 'income_values'
       BlobType = ftWideMemo
     end
-    object QueryEmployeesincome_sum: TWideMemoField
+    object QueryEmployeesincome_sum: TStringField
       FieldName = 'income_sum'
       Origin = 'income_sum'
-      BlobType = ftWideMemo
+      Size = 15
     end
     object QueryEmployeeswithheld_fields: TWideMemoField
       FieldName = 'withheld_fields'
@@ -75,20 +74,20 @@ object DM: TDM
       Origin = 'withheld_values'
       BlobType = ftWideMemo
     end
-    object QueryEmployeeswithheld_sum: TWideMemoField
+    object QueryEmployeeswithheld_sum: TStringField
       FieldName = 'withheld_sum'
       Origin = 'withheld_sum'
-      BlobType = ftWideMemo
+      Size = 15
     end
-    object QueryEmployeesmonth_begin: TWideMemoField
+    object QueryEmployeesmonth_begin: TStringField
       FieldName = 'month_begin'
       Origin = 'month_begin'
-      BlobType = ftWideMemo
+      Size = 15
     end
-    object QueryEmployeespay_all: TWideMemoField
+    object QueryEmployeespay_all: TStringField
       FieldName = 'pay_all'
       Origin = 'pay_all'
-      BlobType = ftWideMemo
+      Size = 15
     end
     object QueryEmployeespayments_fields: TWideMemoField
       FieldName = 'payments_fields'
@@ -100,15 +99,15 @@ object DM: TDM
       Origin = 'payments_values'
       BlobType = ftWideMemo
     end
-    object QueryEmployeespayments_sum: TWideMemoField
+    object QueryEmployeespayments_sum: TStringField
       FieldName = 'payments_sum'
       Origin = 'payments_sum'
-      BlobType = ftWideMemo
+      Size = 15
     end
-    object QueryEmployeessalary_hand: TWideMemoField
+    object QueryEmployeessalary_hand: TStringField
       FieldName = 'salary_hand'
       Origin = 'salary_hand'
-      BlobType = ftWideMemo
+      Size = 15
     end
     object QueryEmployeessigned: TBooleanField
       FieldName = 'signed'
@@ -134,6 +133,7 @@ object DM: TDM
     Top = 168
   end
   object FDPhysSQLiteDriverLink1: TFDPhysSQLiteDriverLink
+    VendorLib = 'sqlite3.dll'
     Left = 136
     Top = 96
   end

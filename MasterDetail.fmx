@@ -13249,14 +13249,15 @@ object MasterDetailForm: TMasterDetailForm
     Size.Height = 434.000000000000000000
     Size.PlatformDefault = False
     StyleLookup = 'tabcontrolstyle'
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 5
     TabPosition = None
+    OnChange = TabControl1Change
     object tabEmployees: TTabItem
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 12.000000000000000000
       Size.Height = 12.000000000000000000
       Size.PlatformDefault = False
@@ -13281,7 +13282,7 @@ object MasterDetailForm: TMasterDetailForm
           TabOrder = 0
           object Layout3: TLayout
             Align = Client
-            Size.Width = 519.000000000000000000
+            Size.Width = 408.000000000000000000
             Size.Height = 57.000000000000000000
             Size.PlatformDefault = False
             TabOrder = 0
@@ -13290,7 +13291,7 @@ object MasterDetailForm: TMasterDetailForm
               StyledSettings = [Family, Style, FontColor]
               Margins.Left = 20.000000000000000000
               Position.X = 20.000000000000000000
-              Size.Width = 499.000000000000000000
+              Size.Width = 388.000000000000000000
               Size.Height = 28.000000000000000000
               Size.PlatformDefault = False
               StyleLookup = 'listboxitemlabel'
@@ -13300,13 +13301,33 @@ object MasterDetailForm: TMasterDetailForm
               Align = Client
               StyledSettings = [Family, Style]
               Margins.Left = 20.000000000000000000
-              Size.Width = 499.000000000000000000
+              Size.Width = 388.000000000000000000
               Size.Height = 29.000000000000000000
               Size.PlatformDefault = False
               StyleLookup = 'embossedlabel'
               TextSettings.Font.Size = 15.000000000000000000
               TextSettings.FontColor = claCrimson
               Text = #1053#1077' '#1087#1086#1083#1091#1095#1080#1083
+            end
+          end
+          object Layout9: TLayout
+            Align = Right
+            Position.X = 408.000000000000000000
+            Size.Width = 111.000000000000000000
+            Size.Height = 57.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+            object Button1: TButton
+              Action = actionShowSignPicture
+              Align = Center
+              Enabled = True
+              ImageIndex = -1
+              Size.Width = 46.000000000000000000
+              Size.Height = 46.000000000000000000
+              Size.PlatformDefault = False
+              StyleLookup = 'composetoolbutton'
+              TabOrder = 0
+              Visible = True
             end
           end
         end
@@ -13384,7 +13405,7 @@ object MasterDetailForm: TMasterDetailForm
       CustomIcon = <
         item
         end>
-      IsSelected = False
+      IsSelected = True
       Size.Width = 12.000000000000000000
       Size.Height = 12.000000000000000000
       Size.PlatformDefault = False
@@ -13395,9 +13416,9 @@ object MasterDetailForm: TMasterDetailForm
       ExplicitSize.cy = 12.000000000000000000
       object Layout4: TLayout
         Align = HorzCenter
-        Position.X = -251.000000000000000000
+        Position.X = 127.000000000000000000
         Size.Width = 553.000000000000000000
-        Size.Height = 50.000000000000000000
+        Size.Height = 434.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
         object GroupBox1: TGroupBox
@@ -13421,24 +13442,53 @@ object MasterDetailForm: TMasterDetailForm
               Size.Height = 77.000000000000000000
               Size.PlatformDefault = False
               TabOrder = 0
-              object Label2: TLabel
-                Align = MostTop
-                Margins.Top = 20.000000000000000000
-                Position.Y = 20.000000000000000000
-                Size.Width = 441.000000000000000000
-                Size.Height = 17.000000000000000000
-                Size.PlatformDefault = False
-                Text = #1055#1077#1088#1080#1086#1076':'
-              end
-              object cboPeriods: TComboBox
-                Align = Top
-                Margins.Top = 10.000000000000000000
-                Position.Y = 47.000000000000000000
-                Size.Width = 441.000000000000000000
-                Size.Height = 32.000000000000000000
+              object Layout11: TLayout
+                Align = Right
+                Position.X = 365.000000000000000000
+                Size.Width = 76.000000000000000000
+                Size.Height = 77.000000000000000000
                 Size.PlatformDefault = False
                 TabOrder = 1
-                OnChange = cboPeriodsChange
+                object btnDeleteList: TButton
+                  Action = actionDeleteList
+                  Align = MostBottom
+                  Enabled = True
+                  ImageIndex = -1
+                  Position.X = 15.000000000000000000
+                  Position.Y = 31.000000000000000000
+                  Size.Width = 46.000000000000000000
+                  Size.Height = 46.000000000000000000
+                  Size.PlatformDefault = False
+                  StyleLookup = 'trashtoolbutton'
+                  TabOrder = 0
+                  Visible = True
+                end
+              end
+              object Layout12: TLayout
+                Align = Client
+                Size.Width = 365.000000000000000000
+                Size.Height = 77.000000000000000000
+                Size.PlatformDefault = False
+                TabOrder = 2
+                object Label2: TLabel
+                  Align = MostTop
+                  Margins.Top = 20.000000000000000000
+                  Position.Y = 20.000000000000000000
+                  Size.Width = 365.000000000000000000
+                  Size.Height = 17.000000000000000000
+                  Size.PlatformDefault = False
+                  Text = #1055#1077#1088#1080#1086#1076':'
+                end
+                object cboPeriods: TComboBox
+                  Align = Top
+                  Margins.Top = 10.000000000000000000
+                  Position.Y = 47.000000000000000000
+                  Size.Width = 365.000000000000000000
+                  Size.Height = 32.000000000000000000
+                  Size.PlatformDefault = False
+                  TabOrder = 1
+                  OnChange = cboPeriodsChange
+                end
               end
             end
           end
@@ -13455,24 +13505,39 @@ object MasterDetailForm: TMasterDetailForm
               Size.Height = 77.000000000000000000
               Size.PlatformDefault = False
               TabOrder = 0
-              object Label3: TLabel
-                Align = MostTop
-                Margins.Top = 20.000000000000000000
-                Position.Y = 20.000000000000000000
-                Size.Width = 441.000000000000000000
-                Size.Height = 17.000000000000000000
-                Size.PlatformDefault = False
-                Text = #1055#1086#1076#1088#1072#1079#1076#1077#1083#1077#1085#1080#1077':'
-              end
-              object cboDepartments: TComboBox
-                Align = Top
-                Margins.Top = 10.000000000000000000
-                Position.Y = 47.000000000000000000
-                Size.Width = 441.000000000000000000
-                Size.Height = 32.000000000000000000
+              object Layout13: TLayout
+                Align = Client
+                Size.Width = 365.000000000000000000
+                Size.Height = 77.000000000000000000
                 Size.PlatformDefault = False
                 TabOrder = 1
-                OnChange = cboPeriodsChange
+                object Label3: TLabel
+                  Align = MostTop
+                  Margins.Top = 20.000000000000000000
+                  Position.Y = 20.000000000000000000
+                  Size.Width = 365.000000000000000000
+                  Size.Height = 17.000000000000000000
+                  Size.PlatformDefault = False
+                  Text = #1055#1086#1076#1088#1072#1079#1076#1077#1083#1077#1085#1080#1077':'
+                end
+                object cboDepartments: TComboBox
+                  Align = Top
+                  Margins.Top = 10.000000000000000000
+                  Position.Y = 47.000000000000000000
+                  Size.Width = 365.000000000000000000
+                  Size.Height = 32.000000000000000000
+                  Size.PlatformDefault = False
+                  TabOrder = 1
+                  OnChange = cboPeriodsChange
+                end
+              end
+              object Layout14: TLayout
+                Align = Right
+                Position.X = 365.000000000000000000
+                Size.Width = 76.000000000000000000
+                Size.Height = 77.000000000000000000
+                Size.PlatformDefault = False
+                TabOrder = 2
               end
             end
           end
@@ -13498,6 +13563,30 @@ object MasterDetailForm: TMasterDetailForm
         end
       end
     end
+    object tabSignPicture: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 12.000000000000000000
+      Size.Height = 12.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'tabSignPicture'
+      ExplicitSize.cx = 12.000000000000000000
+      ExplicitSize.cy = 12.000000000000000000
+      object SignPicture: TPaintBox
+        Align = Client
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        OnMouseDown = SignPictureMouseDown
+        OnMouseMove = SignPictureMouseMove
+        OnMouseUp = SignPictureMouseUp
+        OnPaint = SignPicturePaint
+      end
+    end
   end
   object MasterToolbar: TToolBar
     Size.Width = 808.000000000000000000
@@ -13506,7 +13595,7 @@ object MasterDetailForm: TMasterDetailForm
     TabOrder = 6
     object MasterLabel: TLabel
       Align = Client
-      Size.Width = 762.000000000000000000
+      Size.Width = 602.000000000000000000
       Size.Height = 46.000000000000000000
       Size.PlatformDefault = False
       StyleLookup = 'toollabel'
@@ -13520,13 +13609,52 @@ object MasterDetailForm: TMasterDetailForm
       Size.PlatformDefault = False
       StyleLookup = 'detailstoolbutton'
     end
+    object Layout10: TLayout
+      Align = Right
+      Position.X = 648.000000000000000000
+      Size.Width = 160.000000000000000000
+      Size.Height = 46.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object btnSaveSign: TButton
+        Action = actionSaveSign
+        Align = Center
+        Enabled = True
+        ImageIndex = -1
+        Size.Width = 104.000000000000000000
+        Size.Height = 46.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'deletetoolbutton'
+        TabOrder = 0
+        Visible = False
+      end
+    end
+    object btnBack: TButton
+      Action = actionSelectEmployees
+      Align = Left
+      Enabled = True
+      ImageIndex = -1
+      Position.X = 46.000000000000000000
+      Size.Width = 46.000000000000000000
+      Size.Height = 46.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'backtoolbutton'
+      TabOrder = 1
+      Visible = False
+    end
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = 'xml'
     Filter = '*.xml|*.xml|All files|*.*'
     Options = [ofEnableSizing]
-    Left = 667
+    Left = 587
     Top = 11
+  end
+  object SaveDialog1: TSaveDialog
+    DefaultExt = 'png'
+    Filter = '*.png|*.png|All files|*.*'
+    Left = 248
+    Top = 8
   end
   object MVOptions: TMultiView
     DrawerOptions.TouchAreaSize = 15.000000000000000000
@@ -13652,6 +13780,7 @@ object MasterDetailForm: TMasterDetailForm
     end
   end
   object ActionList1: TActionList
+    OnUpdate = ActionList1Update
     Left = 112
     Top = 8
     object LiveBindingsBindNavigateNext1: TFMXBindNavigateNext
@@ -13670,11 +13799,41 @@ object MasterDetailForm: TMasterDetailForm
       Category = 'Tab'
       Tab = tabEmployees
     end
+    object actionSelectSignPicture: TChangeTabAction
+      Category = 'Tab'
+      Tab = tabSignPicture
+    end
+    object actionPreviousTab: TPreviousTabAction
+      Category = 'Tab'
+      TabControl = TabControl1
+    end
+    object actionSaveSign: TAction
+      Category = 'Sign'
+      Text = #1057#1086#1093#1088#1072#1085#1080#1090#1100
+      Visible = False
+      OnExecute = actionSaveSignExecute
+    end
+    object actionShowSignPicture: TAction
+      Category = 'Sign'
+      Text = #1055#1086#1076#1087#1080#1089#1100
+      OnExecute = actionShowSignPictureExecute
+    end
+    object actionExportSign: TAction
+      Category = 'Sign'
+      Text = #1069#1082#1089#1087#1086#1088#1090
+      Visible = False
+      OnExecute = actionExportSignExecute
+    end
+    object actionDeleteList: TAction
+      Category = 'Employee'
+      Text = 'actionDeleteList'
+      OnExecute = actionDeleteListExecute
+    end
   end
   object DataSource1: TDataSource
     DataSet = DM.QueryEmployees
     OnDataChange = DataSource1DataChange
-    Left = 552
+    Left = 520
     Top = 8
   end
   object BindSourceDB1: TBindSourceDB
