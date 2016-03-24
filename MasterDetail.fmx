@@ -13249,7 +13249,7 @@ object MasterDetailForm: TMasterDetailForm
     Size.Height = 434.000000000000000000
     Size.PlatformDefault = False
     StyleLookup = 'tabcontrolstyle'
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 5
     TabPosition = None
     OnChange = TabControl1Change
@@ -13257,7 +13257,7 @@ object MasterDetailForm: TMasterDetailForm
       CustomIcon = <
         item
         end>
-      IsSelected = False
+      IsSelected = True
       Size.Width = 12.000000000000000000
       Size.Height = 12.000000000000000000
       Size.PlatformDefault = False
@@ -13405,7 +13405,7 @@ object MasterDetailForm: TMasterDetailForm
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 12.000000000000000000
       Size.Height = 12.000000000000000000
       Size.PlatformDefault = False
@@ -13416,9 +13416,9 @@ object MasterDetailForm: TMasterDetailForm
       ExplicitSize.cy = 12.000000000000000000
       object Layout4: TLayout
         Align = HorzCenter
-        Position.X = 127.000000000000000000
+        Position.X = -251.000000000000000000
         Size.Width = 553.000000000000000000
-        Size.Height = 434.000000000000000000
+        Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
         object GroupBox1: TGroupBox

@@ -3,14 +3,14 @@ unit MasterDetail;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  WinApi.Windows, System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.ListView.Types, Data.Bind.GenData,
   Fmx.Bind.GenData, System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
   Data.Bind.Components, Data.Bind.ObjectScope, FMX.Objects, FMX.StdCtrls, FMX.ListView, FMX.ListView.Appearances,
   FMX.Layouts, FMX.MultiView,FMX.Memo, Fmx.Bind.Navigator, System.Actions, FMX.ActnList,
   FMX.ListView.Adapters.Base, FMX.ScrollBox, FMX.Controls.Presentation,
   FMX.ListBox, FMX.TabControl, FMX.Edit, FMX.SearchBox, Xml.XMLDoc, Xml.XmlIntf,
-  Data.Bind.DBScope, Data.DB, System.Math.Vectors,
+  Data.Bind.DBScope, Data.DB, System.Math.Vectors, System.StrUtils,
   DMSQLite, FMX.Grid;
 
 type
@@ -316,6 +316,12 @@ begin
     Result := $FF8EC694;
   end
   else
+  if (grIncome.Cells[2, ARow] = ctIncomeSum) or
+     (grIncome.Cells[2, ARow] = ctWithheldSum) then
+  begin
+    Result := $FFCEC9E6;
+  end
+  else
   if (grIncome.Cells[2, ARow] = ctSalaryHand) then
   begin
     Result := $FFFBEB5C;
@@ -334,7 +340,7 @@ end;
 procedure TMasterDetailForm.SignPictureMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  FDrawingNow := True;
+  FDrawingNow := not DM.QueryEmployees.FieldByName('signed').AsBoolean;
   FStartX := X;
   FStartY := Y;
 end;
@@ -479,10 +485,10 @@ end;
 procedure TMasterDetailForm.LoadSignPictureFromStream(const Canvas: TCanvas);
 var
   MS: TMemoryStream;
-  Bitmap: TBitMap;
+  Bitmap: FMX.Graphics.TBitMap;
 begin
   MS := TMemoryStream.Create;
-  Bitmap := TBitMap.Create;
+  Bitmap := FMX.Graphics.TBitMap.Create;
   Canvas.BeginScene;
   try
     DM.SignToStream(MS,
@@ -702,7 +708,9 @@ begin
      (grIncome.Cells[2, Row] = ctPayAll) or
      (grIncome.Cells[2, Row] = ctPaymentSum) or
      (grIncome.Cells[2, Row] = ctSalaryHand) or
-     (grIncome.Cells[2, Row] = ctTitle) then
+     (grIncome.Cells[2, Row] = ctTitle) or
+     (grIncome.Cells[2, Row] = ctIncomeSum) or
+     (grIncome.Cells[2, Row] = ctWithheldSum) then
   begin
     DrawCellEx(
       GetBackColor(Row), TAlphaColorRec.Black,
@@ -984,14 +992,24 @@ var
   INode, IPeriod, IEmployees,
   IEmployee, ITmpNode: IXMLNode;
   i, j: Integer;
+  Sl: TStringList;
 begin
   XMLDocument := TXMLDocument.Create(Self);
   try
     lMonth := '';
     lYear := '';
 
-    XMLDocument.LoadFromFile(AFileName);
+    Sl := TStringList.Create;
+    try
+      SL.LoadFromFile(AFileName);
+      SL.Text := ReplaceStr(SL.Text, '''', '"');
+      SL.SaveToFile(AFileName, TEncoding.UTF8);
+    finally
+      SL.Free;
+    end;
+
     XMLDocument.Active := True;
+    XMLDocument.LoadFromFile(AFileName);
 
     if XMLDocument.IsEmptyDoc then
     begin
