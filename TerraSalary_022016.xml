@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Salary>
+   <period>
+      <month>02</month>
+      <year>2016</year>
+   </period>
+   <employees>
+	<employee id="1" name="Иванов Петр Петрович" department="Подразделение1">
+	  <fields>		
+		<field name="По окладу (трудовое соглашение)" type="1">35000</field>
+		<field name="Премия по качеству" type="1">3000</field>
+		<field name="Всего начислено" type="2">38000</field>
+		<field name="Недостача()" type="3">772,97</field>
+		<field name="День рождения()" type="3">60</field>
+		<field name="Всего удержано" type="4">832,97</field>
+		<field name="Сальдо на начало месяца" type="5">0</field>
+		<field name="Итого к выплате" type="6">37167,03</field>
+		<field name="Аванс (по заявлению)" type="7">0</field>
+		<field name="Другие межрасчетные выплаты" type="7">0</field>
+		<field name="Аванс на карте VISA (перечисляется 20 числа предыдущего месяца)" type="7">5600</field>
+		<field name="Зарплата на карте VISA (перечисляется 10 числа текущего месяца)" type="7">8999,89</field>
+		<field name="ИТОГО" type="8">14599,89</field>
+		<field name="К выдаче на руки" type="9">22567,14</field>
+            </fields>
+	</employee>
+	<employee id="2" name="Семенов Евгений Владимирович" department="Подразделение1">
+           <fields>
+		<field name="По окладу (трудовое соглашение)" type="1">35000</field>
+		<field name="Премия по качеству" type="1">3000</field>
+		<field name="Всего начислено" type="2">38000</field>
+		<field name="Недостача()" type="3">0</field>
+		<field name="Всего удержано" type="4">832,97</field>
+		<field name="Сальдо на начало месяца" type="5">0</field>
+		<field name="Итого к выплате" type="6">37167,03</field>
+		<field name="Аванс (по заявлению)" type="7">0</field>
+		<field name="Другие межрасчетные выплаты" type="7">0</field>
+		<field name="Аванс на карте VISA (перечисляется 20 числа предыдущего месяца)" type="7">5600</field>
+		<field name="Зарплата на карте VISA (перечисляется 10 числа текущего месяца)" type="7">96543,89</field>
+		<field name="ИТОГО" type="8">14599,89</field>
+		<field name="К выдаче на руки" type="9">97653,14</field>
+            </fields> 
+	</employee>
+	<employee id="3" name="Медведев Дмитрий Анатольевич" department="Подразделение2">
+            <fields>
+		<field name="По окладу (трудовое соглашение)" type="1">350000</field>
+		<field name="Премия по качеству" type="1">3000</field>
+		<field name="Всего начислено" type="2">380000</field>
+		<field name="Недостача()" type="3">772,97</field>
+		<field name="День рождения()" type="3">60</field>
+		<field name="Всего удержано" type="4">832,97</field>
+		<field name="Сальдо на начало месяца" type="5">0</field>
+		<field name="Итого к выплате" type="6">37167,03</field>
+		<field name="Аванс (по заявлению)" type="7">0</field>
+		<field name="Другие межрасчетные выплаты" type="7">0</field>
+		<field name="Аванс на карте VISA (перечисляется 20 числа предыдущего месяца)" type="7">5600</field>
+		<field name="Зарплата на карте VISA (перечисляется 10 числа текущего месяца)" type="7">865425,89</field>
+		<field name="ИТОГО" type="8">14599,89</field>
+		<field name="К выдаче на руки" type="9">654745,14</field>
+            </fields> 
+	</employee>
+	<employee id="4" name="Лепс Григорий" department="Подразделение3">
+           <fields>
+		<field name="По окладу (трудовое соглашение)" type="1">35000</field>
+		<field name="Премия по качеству" type="1">3000</field>
+		<field name="Всего начислено" type="2">38000</field>
+		<field name="Недостача()" type="3">772,97</field>
+		<field name="День рождения()" type="3">60</field>
+		<field name="Всего удержано" type="4">832,97</field>
+		<field name="Сальдо на начало месяца" type="5">0</field>
+		<field name="Итого к выплате" type="6">37167,03</field>
+		<field name="Аванс (по заявлению)" type="7">0</field>
+		<field name="Другие межрасчетные выплаты" type="7">0</field>
+		<field name="Аванс на карте VISA (перечисляется 20 числа предыдущего месяца)" type="7">5600</field>
+		<field name="Зарплата на карте VISA (перечисляется 10 числа текущего месяца)" type="7">43427,89</field>
+		<field name="ИТОГО" type="8">14599,89</field>
+		<field name="К выдаче на руки" type="9">54623,14</field>
+            </fields>
+	</employee>
+	<employee id="5" name="Меладзе Валерий" department="Подразделение1">
+           <fields>
+		<field name="По окладу (трудовое соглашение)" type="1">35000</field>
+		<field name="Премия по качеству" type="1">3000</field>
+		<field name="Всего начислено" type="2">38000</field>
+		<field name="Недостача()" type="3">772,97</field>
+		<field name="День рождения()" type="3">60</field>
+		<field name="Всего удержано" type="4">832,97</field>
+		<field name="Сальдо на начало месяца" type="5">0</field>
+		<field name="Итого к выплате" type="6">37167,03</field>
+		<field name="Аванс (по заявлению)" type="7">0</field>
+		<field name="Другие межрасчетные выплаты" type="7">0</field>
+		<field name="Аванс на карте VISA (перечисляется 20 числа предыдущего месяца)" type="7">5600</field>
+		<field name="Зарплата на карте VISA (перечисляется 10 числа текущего месяца)" type="7">8999,89</field>
+		<field name="ИТОГО" type="8">14599,89</field>
+		<field name="К выдаче на руки" type="9">563456,14</field>
+            </fields>
+	</employee>
+   </employees>
+</Salary>
