@@ -24,6 +24,7 @@ object DM: TDM
       FieldName = 'id'
       Origin = 'id'
       ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
     end
     object QueryEmployeesid_department: TIntegerField
       FieldName = 'id_department'
@@ -136,5 +137,12 @@ object DM: TDM
     VendorLib = 'sqlite3.dll'
     Left = 136
     Top = 96
+  end
+  object FDSQLiteBackup1: TFDSQLiteBackup
+    DriverLink = FDPhysSQLiteDriverLink1
+    Catalog = 'MAIN'
+    DestCatalog = 'MAIN'
+    Left = 144
+    Top = 168
   end
 end

@@ -55,12 +55,8 @@ type
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     btnLoadEmployees: TButton;
-    Layout5: TLayout;
-    Layout6: TLayout;
-    Layout7: TLayout;
     Label2: TLabel;
     cboPeriods: TComboBox;
-    Layout8: TLayout;
     Label3: TLabel;
     cboDepartments: TComboBox;
     OpenDialog1: TOpenDialog;
@@ -85,12 +81,18 @@ type
     SaveDialog1: TSaveDialog;
     actionExportSign: TAction;
     btnBack: TButton;
-    Layout11: TLayout;
-    Layout12: TLayout;
-    Layout13: TLayout;
-    Layout14: TLayout;
-    btnDeleteList: TButton;
+    btnOpenList: TButton;
     actionDeleteList: TAction;
+    liProgramOptions: TListBoxItem;
+    tabProgramOptions: TTabItem;
+    actionProgramOptions: TChangeTabAction;
+    Layout15: TLayout;
+    Layout16: TLayout;
+    btnCancelSign: TButton;
+    actionCancelSign: TAction;
+    btnDeleteList: TButton;
+    btnExportList: TButton;
+    actionExportEmployees: TAction;
     procedure lstEmployeesItemClick(const Sender: TObject; const AItem: TListViewItem);
     procedure lstOptionsItemClick(const Sender: TCustomListBox;
       const Item: TListBoxItem);
@@ -119,6 +121,10 @@ type
     procedure actionExportSignExecute(Sender: TObject);
     procedure actionDeleteListExecute(Sender: TObject);
     procedure ActionList1Update(Action: TBasicAction; var Handled: Boolean);
+    procedure liProgramOptionsClick(Sender: TObject);
+    procedure actionCancelSignExecute(Sender: TObject);
+    procedure btnOpenListClick(Sender: TObject);
+    procedure actionExportEmployeesExecute(Sender: TObject);
   private
     { Private declarations }
     FDrawingNow: Boolean;
@@ -135,6 +141,7 @@ type
     procedure DrawSignPicture(const Canvas: TCanvas);
     procedure LoadSignPictureFromStream(const Canvas: TCanvas);
     procedure SaveSignPicture;
+    procedure CancelSign;
     procedure ExportSignPicture;
     procedure DrawSign(const Canvas: TCanvas);
   public
@@ -162,22 +169,56 @@ begin
   end;
 end;
 
-procedure TMasterDetailForm.actionDeleteListExecute(Sender: TObject);
+procedure TMasterDetailForm.actionCancelSignExecute(Sender: TObject);
 begin
+  CancelSign;
+  UpdateEmployeesList;
+  actionSelectEmployees.ExecuteTarget(Sender);
+end;
+
+procedure TMasterDetailForm.actionDeleteListExecute(Sender: TObject);
+var
+  dep: String;
+begin
+  dep := '';
+  if cboDepartments.ItemIndex > 0 then
+  begin
+    dep := cboDepartments.Items[cboDepartments.ItemIndex];
+  end;
+
   if cboPeriods.ItemIndex <> -1 then
   begin
     if MessageDlg(
-         Format('Удалить список сотрудников за период "%s" ?', [cboPeriods.Items[cboPeriods.ItemIndex]]),
+         Format('Удалить список сотрудников за период "%s" "%s" ?', [cboPeriods.Items[cboPeriods.ItemIndex], dep]),
          TMsgDlgType.mtConfirmation,
          mbOKCancel, 0) = mrOK then
     begin
-      DM.DeletePeriod(cboPeriods.Items[cboPeriods.ItemIndex]);
-      DM.GetPeriods(cboPeriods.Items);
-      if cboPeriods.Items.Count > 0 then
-      begin
-         cboPeriods.ItemIndex := 0;
-      end;
+      DM.DeletePeriod(cboPeriods.Items[cboPeriods.ItemIndex], dep);
+      UpdateLists;
     end;
+  end;
+end;
+
+procedure TMasterDetailForm.actionExportEmployeesExecute(Sender: TObject);
+var
+  oldFilter: String;
+  oldDefaultExt: String;
+begin
+  oldFilter := SaveDialog1.Filter;
+  oldDefaultExt := SaveDialog1.DefaultExt;
+
+  try
+    SaveDialog1.Filter := '*.db|*.db|All files|*.*';
+    SaveDialog1.DefaultExt := 'db';
+    SaveDialog1.FileName := 'база выданной зарплаты.db';
+
+    if SaveDialog1.Execute then
+    begin
+      DM.BackupDB(SaveDialog1.FileName);
+    end;
+  finally
+    SaveDialog1.Filter := oldFilter;
+    SaveDialog1.DefaultExt := oldDefaultExt;
   end;
 end;
 
@@ -212,6 +253,12 @@ begin
     LoadFromXML(OpenDialog1.FileName);
     UpdateLists;
   end;
+end;
+
+procedure TMasterDetailForm.btnOpenListClick(Sender: TObject);
+begin
+  UpdateEmployeesList;
+  actionSelectEmployees.ExecuteTarget(Sender);
 end;
 
 procedure TMasterDetailForm.UpdateEmployeesList;
@@ -272,7 +319,7 @@ end;
 
 procedure DrawCellEx(
   ABackColor: TAlphaColor; AFontColor: TAlphaColor; AText: String;
-  const Canvas: TCanvas; const Bounds: TRectF; AFontSize: Integer = 14);
+  const Canvas: TCanvas; const Bounds: TRectF; AFontSize: Integer = 18);
 begin
   Canvas.Fill.Color := ABackColor;
   Canvas.FillRect(Bounds, 0, 0, [], 1);
@@ -299,7 +346,7 @@ const
   ctSignPictureWidth = 800;
   ctSignPictureHeight = 1200;
   ctLeftpos = 10;
-  ctSignPictureRowHeight = 18;
+  ctSignPictureRowHeight = 20;
 
 function TMasterDetailForm.GetBackColor(ARow: Integer): TAlphaColor;
 begin
@@ -432,7 +479,7 @@ begin
       $FFFBEB5C, TAlphaColorRec.Black,
       Format('Расчетный листок за %s %s г. по зарплате', [
         DM.QueryEmployees.FieldByName('month').AsString, DM.QueryEmployees.FieldByName('year').AsString]),
-      Canvas, RectF, 12);
+      Canvas, RectF, 16);
 
     // ФИО
     TopPos := TopPos + ctSignPictureRowHeight;
@@ -440,7 +487,7 @@ begin
       $FFFBEB5C, TAlphaColorRec.Black,
       DM.QueryEmployees.FieldByName('name').AsString,
       Canvas,
-      TRectF.Create(ctLeftpos, TopPos, ctSignPictureWidth, TopPos + ctSignPictureRowHeight), 14);
+      TRectF.Create(ctLeftpos, TopPos, ctSignPictureWidth, TopPos + ctSignPictureRowHeight), 18);
 
     if grIncome.RowCount < 2 then
     begin
@@ -457,7 +504,7 @@ begin
           GetBackColor(I), TAlphaColorRec.Black,
           grIncome.Cells[0, I],
           Canvas,
-          TRectF.Create(ctLeftpos, TopPos, ctSignPictureWidth, TopPos + ctSignPictureRowHeight), 12);
+          TRectF.Create(ctLeftpos, TopPos, ctSignPictureWidth, TopPos + ctSignPictureRowHeight), 16);
 
         if grIncome.Cells[1, I] <> '' then
         begin
@@ -465,7 +512,7 @@ begin
             GetBackColor(I), TAlphaColorRec.Black,
             grIncome.Cells[1, I] + ' руб.',
             Canvas,
-            TRectF.Create(620, TopPos, ctSignPictureWidth, TopPos + ctSignPictureRowHeight), 12);
+            TRectF.Create(620, TopPos, ctSignPictureWidth, TopPos + ctSignPictureRowHeight), 16);
         end;
       end;
     end;
@@ -475,7 +522,7 @@ begin
       $FFF6F6F6, TAlphaColorRec.Black,
       'Подпись ______________________________________________',
       Canvas,
-      TRectF.Create(ctLeftpos, TopPos, ctSignPictureWidth, TopPos + 50), 14);
+      TRectF.Create(ctLeftpos, TopPos, ctSignPictureWidth, TopPos + 50), 18);
 
   finally
     Canvas.EndScene;
@@ -540,6 +587,9 @@ begin
     actionExportSign.Visible := False;
     btnBack.Visible := False;
   end;
+  actionCancelSign.Visible :=
+    DM.QueryEmployees.FieldByName('signed').AsBoolean and
+    (TabControl1.ActiveTab = tabSignPicture);
 end;
 
 procedure TMasterDetailForm.UpdateEmployeeInfo;
@@ -781,6 +831,13 @@ end;
 procedure TMasterDetailForm.liEmployeesManagerClick(Sender: TObject);
 begin
   actionSelectEmployeesManager.ExecuteTarget(Sender);
+end;
+
+procedure TMasterDetailForm.liProgramOptionsClick(Sender: TObject);
+begin
+  MVEmployees.HideMaster;
+  actionProgramOptions.ExecuteTarget(Sender);
+  MasterLabel.Text := '';
 end;
 
 procedure TMasterDetailForm.lstEmployeesItemClick(const Sender: TObject; const AItem: TListViewItem);
@@ -1083,6 +1140,14 @@ begin
         DM.QueryEmployees.FieldByName('year').AsString,
         DM.QueryEmployees.FieldByName('id_user').AsString);
   end;
+end;
+
+procedure TMasterDetailForm.CancelSign;
+begin
+  DM.CancelSign(
+    DM.QueryEmployees.FieldByName('month').AsString,
+    DM.QueryEmployees.FieldByName('year').AsString,
+    DM.QueryEmployees.FieldByName('id_user').AsString);
 end;
 
 procedure TMasterDetailForm.SaveSignPicture;

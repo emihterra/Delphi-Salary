@@ -58,6 +58,7 @@ type
     QueryEmployeessigned: TBooleanField;
     QueryEmployeessign_time: TSQLTimeStampField;
     QueryEmployeessign_pic: TBlobField;
+    FDSQLiteBackup1: TFDSQLiteBackup;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
   private
@@ -109,6 +110,10 @@ type
       AMonth: String;
       AYear: String;
       AIDUser: String);
+    procedure CancelSign(
+      AMonth: String;
+      AYear: String;
+      AIDUser: String);
     procedure SignToFile(
       AFileName: String;
       AMonth: String;
@@ -119,7 +124,8 @@ type
       AMonth: String;
       AYear: String;
       AIDUser: String);
-    procedure DeletePeriod(AMonthYear: String);
+    procedure DeletePeriod(AMonthYear: String; ADepartment: String = '');
+    function BackupDB(DestPath: String; AShowErrorProc: TShowErrorProc = nil): Boolean;
   end;
 
 var
@@ -560,7 +566,7 @@ end;
 procedure TDM.GetDepartments(SL: TStrings);
 begin
   SL.Clear;
-  OpenSQL('select name from DEPARTMENT order by name',
+  OpenSQL('select d.name from DEPARTMENT d where exists (select e.id from EMPLOYEE e where e.id_department = d.id) order by d.name',
    nil,
    procedure(AADQuery: TDataSet)
    begin
@@ -572,17 +578,36 @@ begin
    end);
 end;
 
-procedure TDM.DeletePeriod(AMonthYear: String);
+procedure TDM.DeletePeriod(AMonthYear: String; ADepartment: String = '');
+var
+  Sql: String;
+  id_department: Integer;
 begin
+  id_department := 0;
+  Sql := 'delete from EMPLOYEE where month=:month and year=:year';
+
+  if ADepartment <> '' then
+  begin
+    id_department := GetOrAddDepartment(ADepartment);
+    if id_department > 0 then
+    begin
+      Sql := Sql + ' and id_department=:id_department';
+    end;
+  end;
+
   ExecSQL(
-    'delete from EMPLOYEE where month=:month and year=:year',
+    Sql,
     procedure(AADQuery: TFDQuery)
     var
       i: Integer;
     begin
-    i := pos(' ', AMonthYear);
-     AADQuery.ParamByName('month').AsString := Copy(AMonthYear, 1, i - 1);
-     AADQuery.ParamByName('year').AsString := Copy(AMonthYear, i + 1, Length(AMonthYear) - i - 2);
+      i := pos(' ', AMonthYear);
+      AADQuery.ParamByName('month').AsString := Copy(AMonthYear, 1, i - 1);
+      AADQuery.ParamByName('year').AsString := Copy(AMonthYear, i + 1, Length(AMonthYear) - i - 2);
+      if (ADepartment <> '') and (id_department > 0) then
+      begin
+        AADQuery.ParamByName('id_department').AsInteger := id_department;
+      end;
     end);
 end;
 
@@ -651,6 +676,22 @@ begin
     end);
 end;
 
+procedure TDM.CancelSign(
+  AMonth: String;
+  AYear: String;
+  AIDUser: String);
+begin
+  ExecSQL(
+    'update EMPLOYEE set signed=:signed where id_user=:id_user and month=:month and year=:year',
+    procedure(AADQuery: TFDQuery)
+    begin
+     AADQuery.ParamByName('id_user').AsString := AIDUser;
+     AADQuery.ParamByName('month').AsString := AMonth;
+     AADQuery.ParamByName('year').AsString := AYear;
+     AADQuery.ParamByName('signed').AsBoolean := False;
+    end);
+end;
+
 procedure TDM.SaveSign(
   Stream: TStream;
   AMonth: String;
@@ -667,7 +708,6 @@ begin
      AADQuery.ParamByName('signed').AsBoolean := True;
      AADQuery.ParamByName('sign_time').AsSQLTimeStamp := DateTimeToSQLTimeStamp(Now);
      AADQuery.ParamByName('sign_pic').LoadFromStream(Stream, TFieldType.ftBlob);
-     AADQuery.ParamByName('year').AsString := AYear;
     end);
 end;
 
@@ -835,6 +875,32 @@ begin
   end;
 
   QueryEmployees.Active := True;
+end;
+
+function TDM.BackupDB(DestPath: String; AShowErrorProc: TShowErrorProc = nil): Boolean;
+begin
+  Result := False;
+  FDSQLiteBackup1.DatabaseObj := SQLConnection.CliObj;
+  FDSQLiteBackup1.DestDatabase := DestPath;
+//  FDSQLiteBackup1.DestMode := smCreate;
+
+  try
+    FDSQLiteBackup1.Backup;
+    Result := FileExists(DestPath);
+  except
+    on E: Exception do
+    begin
+      if Assigned(AShowErrorProc) then
+      begin
+        AShowErrorProc(E.Message);
+      end
+      else
+      begin
+        ShowMessage(E.Message);
+      end;
+    end;
+  end;
+
 end;
 
 end.
